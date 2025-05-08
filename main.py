@@ -118,10 +118,10 @@ def trouver_voisins(grille):
     x, y = trouver_case_vide(grille)
 
     mouvements = {
-        'h': (x - 1, y),
-        'b': (x + 1, y),
-        'g': (x, y - 1),
-        'd': (x, y + 1)
+        'bas': (x - 1, y),
+        'haut': (x + 1, y),
+        'droite': (x, y - 1),
+        'gauche': (x, y + 1)
     }
 
     for direction, (nx, ny) in mouvements.items():
@@ -172,7 +172,7 @@ class TaquinApp:
         self.root = root
         self.root.title("Taquin")
 
-        self.taille = 5
+        self.taille = 3
         self.taquin = creer_taquin(self.taille)
 
         self.frame = tk.Frame(self.root)
@@ -216,7 +216,7 @@ class TaquinApp:
                 if value == 0:
                     self.labels[i][j].config(text="", bg="white")
                 else:
-                    self.labels[i][j].config(text=str(value), bg="lightpink")
+                    self.labels[i][j].config(text=str(value), bg="lightsalmon")
 
     def clic_piece(self, i, j):
         x, y = trouver_case_vide(self.taquin)
@@ -246,10 +246,19 @@ class TaquinApp:
         
         self.solution_fenetre = tk.Toplevel(self.root)
         self.solution_fenetre.title("Solution")
-        solution_text = "Voici la solution du taquin :\n" + " → ".join(sequence_solution)
-        
-        solution_label = tk.Label(self.solution_fenetre, text=solution_text, font=("Courier", 14))
-        solution_label.pack(padx=20, pady=20)
+        frame_scroll = tk.Frame(self.solution_fenetre)
+        frame_scroll.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+
+        scrollbar = tk.Scrollbar(frame_scroll)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        text_box = tk.Text(frame_scroll, wrap=tk.WORD, yscrollcommand=scrollbar.set, font=("Courier", 14), height=20, width=50)
+        text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=text_box.yview)
+
+        text_box.insert(tk.END, "Voici la solution du taquin :\n\n" + "\n".join(sequence_solution))
+        text_box.config(state=tk.DISABLED)
+
 
         fermer_button = tk.Button(self.solution_fenetre, text="Fermer", command=self.solution_fenetre.destroy)
         fermer_button.pack(pady=10)
