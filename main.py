@@ -1,8 +1,9 @@
 from heapq import heappush, heappop
 
+N = 4
 start_state = (10,8,14,7,6,9,2,5,1,12,4,3,11,15,13,0)
-goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)
-goal_positions = {val: (i // 4, i % 4) for i, val in enumerate(goal_state)}
+goal_state = tuple(range(1, N * N)) + (0,)
+goal_positions = {val: (i // N, i % N) for i, val in enumerate(goal_state)}
 moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
 def manhattan(state):
@@ -10,20 +11,20 @@ def manhattan(state):
     for i, val in enumerate(state):
         if val == 0:
             continue
-        current_row, current_col = i // 4, i % 4
+        current_row, current_col = i // N, i % N
         goal_row, goal_col = goal_positions[val]
         distance += abs(current_row - goal_row) + abs(current_col - goal_col)
     return distance
 
 def get_neighbors(state):
     zero_index = state.index(0)
-    row, col = zero_index // 4, zero_index % 4
+    row, col = zero_index // N, zero_index % N
     neighbors = []
 
     for dr, dc in moves:
         new_row, new_col = row + dr, col + dc
-        if 0 <= new_row < 4 and 0 <= new_col < 4:
-            new_index = new_row * 4 + new_col
+        if 0 <= new_row < N and 0 <= new_col < N:  
+            new_index = new_row * N + new_col
             new_state = list(state)
             new_state[zero_index], new_state[new_index] = new_state[new_index], new_state[zero_index]
             neighbors.append(tuple(new_state))
@@ -50,18 +51,18 @@ def greedy_best_first(start, goal):
 def get_direction(prev_state, next_state):
     zero_prev = prev_state.index(0)
     zero_next = next_state.index(0)
-    dr = (zero_next // 4) - (zero_prev // 4)
-    dc = (zero_next % 4) - (zero_prev % 4)
+    dr = (zero_next // N) - (zero_prev // N)
+    dc = (zero_next % N) - (zero_prev % N)
 
     if dr == -1 and dc == 0:
         return "bas", "\033[31m"  
     elif dr == 1 and dc == 0:
-        return "haut", "\033[32m"  
+        return "haut", "\033[32m" 
     elif dr == 0 and dc == 1:
         return "gauche", "\033[33m"  
     elif dr == 0 and dc == -1:
         return "droite", "\033[34m"  
-    return "inconnu", "\033[0m" 
+    return "inconnu", "\033[0m"  
 
 solution_path = greedy_best_first(start_state, goal_state)
 if solution_path:
